@@ -1,52 +1,30 @@
 import re
-# import sys
+import sys
 
-# # Get the file name from the command-line arguments
-# if len(sys.argv) < 2:
-#     print("Please provide a file name as an argument.")
-#     sys.exit(1)
+#Run the program as such: python Lexer.py code.tes
 
-# file_name = sys.argv[1]
+# Get the file name from the command-line arguments
+if len(sys.argv) < 2:
+    print("Please provide a file name as an argument.")
+    sys.exit(1)
 
-# if(file_name[-4:].lower() != '.tes'):
-#     print('Your file needs to have a .tes extension')
-#     sys.exit(1)
+file_name = sys.argv[1]
 
-# # Open the file and do something with its contents
-# try:
-#     with open(file_name, 'r') as file:
-#         contents = file.read()
-#         # Process the file contents here
-# except FileNotFoundError:
-#     print(f"Error: File '{file_name}' not found.")
+if(file_name[-4:].lower() != '.tes'):
+    print('Your file needs to have a .tes extension')
+    sys.exit(1)
 
-example = '''
-fn sum(numlist as vector) <int> {
-    result :: int = 0;
-    for (i = 0 to length(numlist))
-    begin   <%dsdasdasdasdas%>
-    a = ' asd fsdfdjsjdfkll l \\n \t \\ asddda 8uujm \\  asd '
-    <% asdas
-    asd
-    asd
-    asd
-    as
-    d
-    asd
-    asdda
-    s
-    dasd
-    asd
-    asd
-    %>
-        result = result + numlist[i];
-    end <%dsdasdasdasdas%>
-    <%dsdasdasdasdas%>
-    return result;
-}
-'''
+# Open the file and do something with its contents
+try:
+    with open(file_name, 'r') as file:
+        text = file.read()
+        # Process the file contents here
+except FileNotFoundError:
+    print(f"Error: File '{file_name}' not found.")
+
 
 def lex(contents):
+    #Check to see if there are any comments left open
     comment_begin = r'<%'
     comment_end = r'%>'
 
@@ -56,7 +34,8 @@ def lex(contents):
     end_matches_len = sum(1 for _ in end_matches)
     
     if(begin_matches_len != end_matches_len):
-        print('A comment was opened and never closed!')
+        print('Lexical Error: The number of closed and opened comments don\'t match!')
+        exit()
     # else:
     #     i = 0
     #     for match in begin_matches:
@@ -67,7 +46,7 @@ def lex(contents):
     #         replacement = '\n' * len(re.findall(new_line, comment))
     #         contents = contents[:start] + replacement + contents[end:]
     
-
+    #Replace every comment with whitespace
     comment_pattern = r"(?s)<%.*?%>"
     
     def replacement(match):
@@ -81,7 +60,8 @@ def lex(contents):
 
     # comment = r"(?s)<%.*?%>"
     # contents = re.sub(comment, "", contents)
-            
+          
+    #Tokenization start
     line = 1
     tokens = []
     line_by_line = list(contents.split('\n'))
@@ -113,13 +93,17 @@ def lex(contents):
                       '!=',
                       '&&'
     )
+    #Going through the code line by line
     for x in line_by_line:
         column = 1
+        #Accounting for empty lines
         if(x == ''):
             tokens.append([])
         while(column <= len(x)):
+            #Accounting for whitespace
             if (x[column - 1] == ' '):
                 column += 1
+            #Tokenizing strings and throwing lexical errors if they don't close properly
             elif(x[column - 1] == "'"):
                 string_pattern = r'\'[\d | \D | \n | \t | \\ | \' | \"]*\''
                 try:
@@ -136,12 +120,14 @@ def lex(contents):
                 except AttributeError:
                     print(f'Lexical error: Faulty string at line: {line} column: {column}')
                     exit()
+            #Tokenizing symbols
             elif(x[column - 1:column + 1] in DOUBLE_SYMBOLS):
                 tokens.append([x[column - 1:column + 1], line, column])
                 column += 2
             elif(x[column - 1] in SINGLE_SYMBOLS):
                 tokens.append([x[column - 1], line, column])
                 column += 1
+            #Tokenizing words
             else:
                 tokens.append([])
                 new_token = ''
@@ -153,6 +139,7 @@ def lex(contents):
                 tokens[-1].extend([new_token, new_token_line, new_token_column])
         line += 1
 
+    #A dictionary of all tokens and their RegEx
     TOKEN_DICT = {
         #Key Words
         'FN':r'^fn$',
@@ -218,7 +205,7 @@ def lex(contents):
         'COLON':r':'
     }
     
-
+    #Labeling each token
     for token in tokens:
         if(token == []):
             continue
@@ -232,4 +219,4 @@ def lex(contents):
         
     
 
-lex(example)
+lex(text)
