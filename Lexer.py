@@ -47,7 +47,7 @@ def lex(contents):
     #         contents = contents[:start] + replacement + contents[end:]
     
     #Replace every comment with whitespace
-    comment_pattern = r"(?s)<%.*?%>"
+    comment_pattern = r'<%([^(<%)(%>)]|<%([^(<%)(%>)])*%>|\n | \t | \\ | \' | \")*%>'
     
     def replacement(match):
         captured_text = match.group(0)
