@@ -214,8 +214,19 @@ def lex(contents):
                 if(re.search(VALUE, token[0]) != None and len(token) == 3):
                     token.append(KEY)
     
+    output = '''
+      Line      |    Column      |    Token      |    Value      
+________________________________________________________________
+'''
     for token in tokens:
-        print(token)
+        if(token == []):
+            continue
+        a = '        '
+        b = 8 - len(str(token[1]))
+        c = 8 - len(str(token[2]))
+        d = 13 - len(token[3])
+        output += f'{a}{str(token[1])}{" " * b}|{a}{str(token[2])}{" " * c}|  {token[3]}{" " * d}|   {token[0]}\n'
+    print(output)
         
     
 
