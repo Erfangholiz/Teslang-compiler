@@ -170,7 +170,7 @@ def lex(contents):
         
         #User Defined
         'NUMBER':r'^\d+$',
-        'ID':r'[A-Za-z]([a-z]|[A-Z]|[0-9]|\_)*',
+        'ID':r'^[A-Za-z]([a-z]|[A-Z]|[0-9]|\_)*$',
         
         
         #Double Symbols
@@ -213,6 +213,10 @@ def lex(contents):
             for KEY, VALUE in TOKEN_DICT.items():
                 if(re.search(VALUE, token[0]) != None and len(token) == 3):
                     token.append(KEY)
+            if(len(token) == 3):
+                #Accounting for identifiers starting with non-english characters
+                print(f'Lexical Error: Erroneous identifier at line {token[1]} column {token[2]}')
+                exit()
     
     output = '''
       Line      |    Column      |    Token      |    Value      
