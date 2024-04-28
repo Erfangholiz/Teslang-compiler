@@ -161,11 +161,11 @@ def lex(contents):
         
         
         #Data Types
-        'INT':r'int',
-        'VECTOR':r'vector',
-        'STR':r'str',
-        'BOOL':r'bool',
-        'NULL':r'null',
+        'INT':r'^int$',
+        'VECTOR':r'^vector$',
+        'STR':r'^str$',
+        'BOOL':r'^bool$',
+        'NULL':r'^null$',
         
         
         #User Defined
