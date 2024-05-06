@@ -25,17 +25,17 @@ except FileNotFoundError:
 
 def lex(contents):
     #Check to see if there are any comments left open
-    comment_begin = r'<%'
-    comment_end = r'%>'
+    # comment_begin = r'<%'
+    # comment_end = r'%>'
 
-    begin_matches = re.finditer(comment_begin, contents)
-    begin_matches_len = sum(1 for _ in begin_matches)
-    end_matches = re.finditer(comment_end, contents)
-    end_matches_len = sum(1 for _ in end_matches)
+    # begin_matches = re.finditer(comment_begin, contents)
+    # begin_matches_len = sum(1 for _ in begin_matches)
+    # end_matches = re.finditer(comment_end, contents)
+    # end_matches_len = sum(1 for _ in end_matches)
     
-    if(begin_matches_len != end_matches_len):
-        print('Lexical Error: The number of closed and opened comments don\'t match!')
-        exit()
+    # if(begin_matches_len != end_matches_len):
+    #     print('Lexical Error: The number of closed and opened comments don\'t match!')
+    #     exit()
     # else:
     #     i = 0
     #     for match in begin_matches:
@@ -47,16 +47,32 @@ def lex(contents):
     #         contents = contents[:start] + replacement + contents[end:]
     
     #Replace every comment with whitespace
-    comment_pattern = r'<%([^(<%)(%>)]|<%([^(<%)(%>)])*%>|\n | \t | \\ | \' | \")*%>'
+    # comment_pattern = r'<%([^(<%)(%>)]|<%([^(<%)(%>)])*%>|\n | \t | \\ | \' | \")*%>'
     
-    def replacement(match):
-        captured_text = match.group(0)
-        newlines_count = len(re.findall(r"\n", captured_text))
-        return "\n" * newlines_count
+    # def replacement(match):
+    #     captured_text = match.group(0)
+    #     newlines_count = len(re.findall(r"\n", captured_text))
+    #     return "\n" * newlines_count
 
-    contents = re.sub(comment_pattern, replacement, contents)
-            
-            
+    # contents = re.sub(comment_pattern, replacement, contents)
+    count = 0
+    new_line_counter = 0
+    for i in range(len(contents)):
+        if contents[i:i+2] == '<%':
+            if count == 0:
+                start_comment = i
+            count += 1
+        if count > 0 and contents[i] == '\n':
+            new_line_counter += 1
+        if contents[i:i+2] == '%>':
+            count -= 1
+            if count == 0:
+                contents = contents[:start_comment] + new_line_counter * '\n' + ' ' * ((i+2) - start_comment - 2 * new_line_counter) + contents[i+2:]
+                new_line_counter = 0
+        
+    if count != 0:
+        print('Lexical Error: The number of closed and opened comments don\'t match!')
+        exit()
 
     # comment = r"(?s)<%.*?%>"
     # contents = re.sub(comment, "", contents)
