@@ -67,7 +67,7 @@ def lex(contents):
         if contents[i:i+2] == '%>':
             count -= 1
             if count == 0:
-                contents = contents[:start_comment] + new_line_counter * '\n' + ' ' * ((i+2) - start_comment - 2 * new_line_counter) + contents[i+2:]
+                contents = contents[:start_comment] + ' ' * ((i+2) - start_comment - 2 * new_line_counter) + new_line_counter * '\n' + contents[i+2:]
                 new_line_counter = 0
         
     if count != 0:
